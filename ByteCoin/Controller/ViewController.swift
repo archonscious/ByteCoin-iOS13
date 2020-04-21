@@ -8,40 +8,62 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIPickerViewDataSource {
+
+class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+    
+    let coinManager = CoinManager(selectedCurrencyString: <#String#>)
+
+    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
-    let coinManager = CoinManager()
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    
+   func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return coinManager.currencyArray.count
     }
     
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+               return coinManager.currencyArray[row]
+               
+           }
     
-
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        print(coinManager.currencyArray[row])
+        let selectedCurrency = coinManager.currencyArray[row]
+        coinManager.getCoinPrice(forCurrency: selectedCurrency)
+        
+        
+    }
+    
     @IBOutlet weak var bitcoinLabel: UILabel!
     @IBOutlet weak var currencyLabel: UILabel!
+    @IBOutlet weak var rateLabel: UILabel!
+    
     @IBOutlet weak var currencyPicker: UIPickerView!
     
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+       
+        
         currencyPicker.dataSource = self
-    
-        func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-            return coinManager.currencyArray[row]
-        }
-    
+        currencyPicker.delegate = self
+        
     }
-    for i in 1...10 {
-    while true {
-    print("Hello there!")
-    if i == 5
-    break
-    }
-    }
-
+  
 }
-
-// Test
+extension ViewController: CoinManagerDelegate {
+    
+      func didUpdateRate(_ coinManager: CoinManager, coinModel: CoinModel) {
+          DispatchQueue.main.async {
+            self.rateLabel.text = "\(coinModel.rate)"
+            
+          }
+    }
+        func didFailWithError(error: Error) {
+                   print(error)
+               }
+      }
+      
