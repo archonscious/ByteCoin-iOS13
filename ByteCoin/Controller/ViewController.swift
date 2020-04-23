@@ -9,9 +9,9 @@
 import UIKit
 
 
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, CoinManagerDelegate {
     
-    let coinManager = CoinManager(selectedCurrencyString: <#String#>)
+    var coinManager = CoinManager()
 
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -23,14 +23,15 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-               return coinManager.currencyArray[row]
+        return coinManager.currencyArray[row]
                
            }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         print(coinManager.currencyArray[row])
         let selectedCurrency = coinManager.currencyArray[row]
-        coinManager.getCoinPrice(forCurrency: selectedCurrency)
+        coinManager.getCoinPrice(for: selectedCurrency)
+        
         
         
     }
@@ -47,23 +48,25 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         super.viewDidLoad()
         // Do any additional setup after loading the view.
        
-        
+        coinManager.delegate = self
         currencyPicker.dataSource = self
         currencyPicker.delegate = self
         
     }
   
-}
-extension ViewController: CoinManagerDelegate {
+
+
     
-      func didUpdateRate(_ coinManager: CoinManager, coinModel: CoinModel) {
-          DispatchQueue.main.async {
-            self.rateLabel.text = "\(coinModel.rate)"
-            
-          }
+    func didUpdateRate(rate: String, currency: String) {
+       
+        DispatchQueue.main.async {
+            self.rateLabel.text = rate
+            self.currencyLabel.text = currency
+        }
+          
     }
         func didFailWithError(error: Error) {
                    print(error)
                }
-      }
       
+}
